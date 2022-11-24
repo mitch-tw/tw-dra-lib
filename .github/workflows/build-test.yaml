@@ -8,4 +8,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Run containers
-      run: docker-compose -f docker/docker-compose.yaml up test --abort-on-container-exit
+      run: docker-compose -f docker/docker-compose.yaml up test
