@@ -1,7 +1,8 @@
-Name                       Stmts   Miss  Cover
-----------------------------------------------
-src/dra/__init__.py            3      0   100%
-src/dra/logger.py              2      2     0%
-src/dra/summary_stats.py      18      2    89%
-----------------------------------------------
-TOTAL                         23      4    83%
+Name                             Stmts   Miss  Cover
+----------------------------------------------------
+src/dra/__init__.py                  3      0   100%
+src/dra/logger.py                    2      2     0%
+src/dra/statistical_solvers.py      26      1    96%
+src/dra/summary_stats.py            18      2    89%
+----------------------------------------------------
+TOTAL                               49      5    90%

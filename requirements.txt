@@ -1,1 +1,4 @@
 pandas
+z3-solver
+pipe
+numpy
