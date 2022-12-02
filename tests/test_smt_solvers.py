@@ -1,7 +1,7 @@
 import pytest
 import z3
 
-from dra.statistical_solvers import check_results
+from dra.smt_solvers import check_results
 
 
 def _create_model_solution(

@@ -1,12 +1,13 @@
-from dra.summary_stats import database, expected_results, check_results, generate_block_stats
 import pandas as pd
 import pytest
+
+from dra.summary_stats import check_results, database, expected_results, generate_block_stats
 
 
 def test_database():
     assert isinstance(database, pd.DataFrame)
     assert len(database) == 7
-    assert database.columns.tolist() == ["age", "married", "smoker", "employed"]
+    assert database.columns.tolist() == ['name', 'age', 'married', 'smoker', 'employed']
 
 
 def test_expected_results():
@@ -26,16 +27,13 @@ def test_check_results():
 
 
 def test_generate_block_stats():
-    total_population = (
-        database
-        .agg({"age": ["count", "mean", "median"]})
-        .assign(name="total-population", id="A1")
+    total_population = database.agg({'age': ['count', 'mean', 'median']}).assign(
+        name='total-population', id='A1'
     )
     non_smoker = (
-        database
-        [database.smoker == False]
-        .agg({"age": ["count", "mean", "median"]})
-        .assign(name="total-population", id="A2")
+        database[database.smoker == False]  # noqa: E712
+        .agg({'age': ['count', 'mean', 'median']})
+        .assign(name='total-population', id='A2')
     )
     out = generate_block_stats(total_population, non_smoker)
     assert out.columns.tolist() == ['id', 'name', 'count', 'mean', 'median']
