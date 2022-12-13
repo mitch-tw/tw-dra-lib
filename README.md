@@ -1,6 +1,6 @@
 ##  dra
 
-> 1️⃣ version: 0.5.0
+> 1️⃣ version: 0.6.0
 
 > ✍️ author: Mitchell Lisle
 
