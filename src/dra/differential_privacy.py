@@ -54,23 +54,23 @@ def global_differential_privacy(df: pd.DataFrame) -> PrivateDataFrame:
             {'name': 'total-population', **private_aggregation(clipped.age)},
             {
                 'name': 'non-smoker',
-                **private_aggregation(clipped[clipped.smoker == False].age),  # noqa: E712
+                **private_aggregation(clipped[clipped.smoker == False].age),
             },
             {
                 'name': 'smoker',
-                **private_aggregation(clipped[clipped.smoker == True].age),  # noqa: E712
+                **private_aggregation(clipped[clipped.smoker == True].age),
             },
             {
                 'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),  # noqa: E712
+                **private_aggregation(clipped[clipped.employed == False].age),
             },
             {
                 'name': 'employed',
-                **private_aggregation(clipped[clipped.employed == True].age),  # noqa: E712
+                **private_aggregation(clipped[clipped.employed == True].age),
             },
             {
                 'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),  # noqa: E712
+                **private_aggregation(clipped[clipped.employed == False].age),
             },
         ]
     )
