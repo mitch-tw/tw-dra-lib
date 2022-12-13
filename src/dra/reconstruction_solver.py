@@ -225,7 +225,9 @@ def model_as_dataframe(
 def check_accuracy(output, database) -> float:
     match, non_match = 0, 0
     computed = [tuple(v.values()) for v in output.to_dict(orient='records')]  # type: ignore
-    original = [tuple(v.values()) for v in database.to_dict(orient='records')]  # type: ignore
+    original = [
+        tuple(v.values()) for v in database.drop(columns={'name'}).to_dict(orient='records')
+    ]  # type: ignore
 
     to_check = [list(zip(computed[i], original[i])) for i in range(7)]
     for items in to_check:

@@ -1,29 +1,14 @@
 from itertools import tee
 
-import pandas as pd
 import z3
 
-from dra.reconstruction_solver import check_accuracy, model_as_dataframe, reconstruction
+from dra.reconstruction_solver import check_accuracy, database, model_as_dataframe, reconstruction
 
 
 def pairwise(iterable):
     a, b = tee(iterable)
     next(b, None)
     return zip(a, b)
-
-
-database = pd.DataFrame(
-    [
-        (8, False, False, False),
-        (18, False, True, True),
-        (24, True, False, True),
-        (30, True, True, True),
-        (36, True, False, False),
-        (66, True, False, False),
-        (84, True, True, False),
-    ],
-    columns=['age', 'married', 'smoker', 'employed'],
-)
 
 
 def add_min_max_constraint(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
