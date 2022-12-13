@@ -15,6 +15,7 @@ stats = pd.DataFrame(
         {'id': 'A4', 'name': 'unemployed-non-smoker', 'count': 3, 'mean': 36.67, 'median': 36},
     ]
 ).set_index('id')
+
 population: range = range(int(stats.filter(items=['A1'], axis=0)['count'][0]))
 
 
@@ -41,13 +42,12 @@ def _add_median_constraint(solver: z3.Solver, *, ages: z3.Array, indices, median
 
 def reconstruction(
     solver: z3.Solver,
-    *,
     ages: z3.Array,
     add_min_max_constraint: Callable,
     add_population_mean: Callable,
     add_pairwise_sort_constraint: Callable,
-    add_population_median: Callable
-) -> z3.Solver:
+    add_population_median: Callable,
+) -> Tuple[z3.Solver, z3.IntVector, z3.IntVector, z3.IntVector]:
     solver = add_min_max_constraint(solver, ages)
     solver = add_pairwise_sort_constraint(solver, ages)
     solver = add_population_median(solver, ages)
@@ -57,7 +57,6 @@ def reconstruction(
     solver, employed_indices, __ = _add_employment_constraints(
         solver, ages=ages, non_smoker_indices=non_smoker_indices
     )
-
     return solver, married_indices, smoker_indices, employed_indices
 
 

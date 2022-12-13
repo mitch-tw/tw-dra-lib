@@ -1,7 +1,16 @@
+from itertools import tee
+
 import pandas as pd
 import z3
 
 from dra.reconstruction_solver import reconstruction
+
+
+def pairwise(iterable):
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
 
 database = pd.DataFrame(
     [
@@ -27,21 +36,18 @@ def add_min_max_constraint(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
 
 def add_population_mean(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
     solver.add(z3.Sum([ages[i] for i in range(7)]) / 7 == 38)
-
     return solver
 
 
-def add_pairwise_sort_constraint(solver: z3.Solver, ages: z3.Array) -> None:
+def add_pairwise_sort_constraint(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
     population = range(7)
-    for pair in zip(population[:-1], population[1:]):
-        solver.add(z3.Select(ages, pair[0]) <= z3.Select(ages, pair[1]))
-
+    for a, b in pairwise([ages[i] for i in population]):
+        solver.add(a <= b)
     return solver
 
 
-def add_population_median(solver: z3.Solver, ages: z3.Array) -> None:
+def add_population_median(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
     solver.add(z3.Select(ages, 3) == 30)
-
     return solver
 
 
