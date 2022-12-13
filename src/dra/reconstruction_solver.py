@@ -222,7 +222,7 @@ def model_as_dataframe(
     )
 
 
-def check_accuracy(output, database) -> float:
+def check_accuracy(output, database) -> str:
     match, non_match = 0, 0
     computed = [tuple(v.values()) for v in output.to_dict(orient='records')]  # type: ignore
     original = [
@@ -236,4 +236,4 @@ def check_accuracy(output, database) -> float:
                 match += 1
             else:
                 non_match += 1
-    return (match / (match + non_match)) * 100
+    return f'{(match / (match + non_match)) * 100}%'

@@ -58,4 +58,4 @@ def test_reconstruction():
         smoker_indices=smoker_indices,
         employed_indices=employed_indices,
     )
-    assert check_accuracy(output, database) >= 92
+    assert float(check_accuracy(output, database).replace('%', '')) >= 92
