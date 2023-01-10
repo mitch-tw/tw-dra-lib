@@ -26,10 +26,10 @@ def test_reconstruction():
     solver, married_indices, smoker_indices, employed_indices = reconstruction(
         solver,
         ages=ages,
-        add_min_max_constraint=add_min_max_constraint,
-        add_population_median=add_population_median,
-        add_population_mean=add_population_mean,
-        add_pairwise_sort_constraint=add_pairwise_sort_constraint,
+        min_max_constraint=add_min_max_constraint,
+        population_median=add_population_median,
+        population_mean=add_population_mean,
+        pairwise_sort_constraint=add_pairwise_sort_constraint,
     )
 
     assert z3.sat == solver.check()

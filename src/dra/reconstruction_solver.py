@@ -57,15 +57,15 @@ def _add_median_constraint(solver: z3.Solver, *, ages: z3.Array, indices, median
 def reconstruction(
     solver: z3.Solver,
     ages: z3.Array,
-    add_min_max_constraint: Callable,
-    add_population_mean: Callable,
-    add_pairwise_sort_constraint: Callable,
-    add_population_median: Callable,
+    min_max_constraint: Callable,
+    population_mean: Callable,
+    pairwise_sort_constraint: Callable,
+    population_median: Callable,
 ) -> Tuple[z3.Solver, z3.IntVector, z3.IntVector, z3.IntVector]:
-    solver = add_min_max_constraint(solver, ages)
-    solver = add_pairwise_sort_constraint(solver, ages)
-    solver = add_population_median(solver, ages)
-    solver = add_population_mean(solver, ages)
+    solver = min_max_constraint(solver, ages)
+    solver = pairwise_sort_constraint(solver, ages)
+    solver = population_median(solver, ages)
+    solver = population_mean(solver, ages)
     solver, married_indices, _ = _add_marriage_constraints(solver, ages=ages)
     solver, smoker_indices, non_smoker_indices = _add_smoker_constraints(solver, ages=ages)
     solver, employed_indices, __ = _add_employment_constraints(
@@ -179,7 +179,7 @@ def _add_employment_constraints(
         solver, ages=ages, indices=unemployed_indices, median=_get_stats('C2', 'median')
     )
 
-    # intersection of umemployed and non-smoker
+    # intersection of unemployed and non-smoker
     solver.add(
         *[
             z3.And(
@@ -219,7 +219,7 @@ def model_as_dataframe(
         return df
     raise TypeError(
         'model is not initialised. Either there is no valid model, '
-        'or you forgot to run DatabaseReconstructionAttack.run?'
+        'or you forgot to run the model (I.E `model.check()`)?'
     )
 
 
@@ -237,7 +237,7 @@ def check_accuracy(output, database) -> str:
                 match += 1
             else:
                 non_match += 1
-    return f'{(match / (match + non_match)) * 100}%'
+    return f'{round((match / (match + non_match))) * 100}%'
 
 
 def pairwise(iterable):
@@ -250,7 +250,6 @@ def add_min_max_constraint(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
     for i in range(7):
         solver.add(ages[i] >= 0)
         solver.add(ages[i] <= 125)
-
     return solver
 
 
@@ -260,7 +259,6 @@ def add_population_mean(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
 
 
 def add_pairwise_sort_constraint(solver: z3.Solver, ages: z3.Array) -> z3.Solver:
-    population = range(7)
     for a, b in pairwise([ages[i] for i in population]):
         solver.add(a <= b)
     return solver
