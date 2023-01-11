@@ -45,7 +45,9 @@ database = pd.DataFrame(
 
 
 def check_results(generated: pd.DataFrame) -> bool:
-    results = generated.compare(expected_results)
+    results = generated.compare(
+        expected_results, result_names=('expected-solution', 'your-solution')
+    )
     if len(results) > 0:
         results['stat_name'] = [expected_results.iloc[i]['name'] for i in results.index]
         print(results)
