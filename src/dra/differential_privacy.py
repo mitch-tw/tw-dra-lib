@@ -1,5 +1,5 @@
 from functools import partial
-from typing import NewType
+from typing import NewType, Tuple
 
 import diffprivlib as dp
 import numpy as np
@@ -36,52 +36,58 @@ def randomised_response(truth: bool) -> bool:
         return np.random.choice((True, False))
 
 
-def private_aggregation(values: pd.Series) -> dict:
-    with dp.BudgetAccountant(epsilon=1.1) as budget:
-        return {
-            'count': dp.tools.count_nonzero(values, epsilon=0.1, accountant=budget),
-            'median': dp.tools.median(values, epsilon=0.5, bounds=(30, 40), accountant=budget),
-            'mean': dp.tools.mean(values, epsilon=0.5, bounds=(30, 40), accountant=budget),
-        }
+def private_aggregation(
+    accountant: dp.BudgetAccountant,
+    values: pd.Series,
+    epsilons: Tuple[float, ...] = (0.1, 0.5, 0.5),
+) -> dict:
+    count_epsilon, median_epsilon, mean_epsilon = epsilons
+    return {
+        'count': dp.tools.count_nonzero(values, epsilon=count_epsilon, accountant=accountant),
+        'median': dp.tools.median(
+            values, epsilon=median_epsilon, bounds=(30, 40), accountant=accountant
+        ),
+        'mean': dp.tools.mean(values, epsilon=mean_epsilon, bounds=(30, 40), accountant=accountant),
+    }
 
 
-def global_differential_privacy(df: pd.DataFrame) -> PrivateDataFrame:
+def global_differential_privacy(df: pd.DataFrame, epsilon: float = 10) -> PrivateDataFrame:
     age_bounds = (0, 125)
     clipped = df[df.age.between(*age_bounds)]
-
-    pdf = pd.DataFrame(
-        [
-            {'name': 'total-population', **private_aggregation(clipped.age)},
-            {
-                'name': 'non-smoker',
-                **private_aggregation(clipped[clipped.smoker == False].age),
-            },
-            {
-                'name': 'smoker',
-                **private_aggregation(clipped[clipped.smoker == True].age),
-            },
-            {
-                'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),
-            },
-            {
-                'name': 'employed',
-                **private_aggregation(clipped[clipped.employed == True].age),
-            },
-            {
-                'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),
-            },
-        ]
-    )
+    with dp.BudgetAccountant(epsilon=epsilon) as budget:
+        pdf = pd.DataFrame(
+            [
+                {'name': 'total-population', **private_aggregation(budget, clipped.age)},
+                {
+                    'name': 'non-smoker',
+                    **private_aggregation(budget, clipped[clipped.smoker == False].age),
+                },
+                {
+                    'name': 'smoker',
+                    **private_aggregation(budget, clipped[clipped.smoker == True].age),
+                },
+                {
+                    'name': 'unemployed',
+                    **private_aggregation(budget, clipped[clipped.employed == False].age),
+                },
+                {
+                    'name': 'employed',
+                    **private_aggregation(budget, clipped[clipped.employed == True].age),
+                },
+                {
+                    'name': 'unemployed',
+                    **private_aggregation(budget, clipped[clipped.employed == False].age),
+                },
+            ]
+        )
     return PrivateDataFrame(pdf)
 
 
-def local_differential_privacy(df: pd.DataFrame) -> PrivateDataFrame:
+def local_differential_privacy(df: pd.DataFrame, epsilon: float = 0.33) -> PrivateDataFrame:
     private_database = df.copy()
     private_database = private_database.drop(columns=['name'])
     private_database['age'] = df.age.apply(
-        lambda val: int(dp.mechanisms.Laplace(epsilon=0.33, sensitivity=1).randomise(val))
+        lambda val: int(dp.mechanisms.Laplace(epsilon=epsilon, sensitivity=1).randomise(val))
     )
     private_database['married'] = df.married.apply(randomised_response)
     private_database['smoker'] = df.smoker.apply(randomised_response)
@@ -96,3 +102,7 @@ def main():
     print(global_pdf)
     print('\n')
     print(local_pdf)
+
+
+if __name__ == '__main__':
+    main()
