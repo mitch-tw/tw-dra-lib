@@ -40,16 +40,17 @@ def private_aggregation(
     values: pd.Series,
     budget: float = 5.4,
     epsilons: Tuple[float, ...] = (0.1, 0.1, 0.1),
+    bounds: Tuple[int, int] = (0, 250),
 ) -> dict:
     count_epsilon, median_epsilon, mean_epsilon = epsilons
     with dp.BudgetAccountant(epsilon=budget) as accountant:
         return {
             'count': dp.tools.count_nonzero(values, epsilon=count_epsilon, accountant=accountant),
             'median': dp.tools.median(
-                values, epsilon=median_epsilon, bounds=(30, 40), accountant=accountant
+                values, epsilon=median_epsilon, bounds=bounds, accountant=accountant
             ),
             'mean': dp.tools.mean(
-                values, epsilon=mean_epsilon, bounds=(30, 40), accountant=accountant
+                values, epsilon=mean_epsilon, bounds=bounds, accountant=accountant
             ),
         }
 
@@ -58,8 +59,8 @@ def global_differential_privacy(
     df: pd.DataFrame,
     budget: float = 5.4,
     epsilons: Tuple[float, ...] = (0.1, 0.1, 0.1),
+    age_bounds: Tuple[int, int] = (0, 125),
 ) -> PrivateDataFrame:
-    age_bounds = (0, 125)
     clipped = df[df.age.between(*age_bounds)]
 
     pdf = pd.DataFrame(
