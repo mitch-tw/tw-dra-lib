@@ -95,14 +95,32 @@ def local_differential_privacy(df: pd.DataFrame, epsilon: float = 0.33) -> Priva
     return PrivateDataFrame(private_database)
 
 
-def main():
-    database = make_database(10)
-    global_pdf: PrivateDataFrame = global_differential_privacy(database)
-    local_pdf: PrivateDataFrame = local_differential_privacy(database)
-    print(global_pdf)
-    print('\n')
-    print(local_pdf)
+def no_differential_privacy(database: pd.DataFrame) -> pd.DataFrame:
+    def agg(ages: pd.Series) -> dict:
+        return {'count': len(ages), 'median': np.median(ages), 'mean': np.mean(ages)}
 
-
-if __name__ == '__main__':
-    main()
+    return pd.DataFrame(
+        [
+            {'name': 'total-population', **agg(database.age)},
+            {
+                'name': 'non-smoker',
+                **agg(database[database.smoker == False].age),
+            },
+            {
+                'name': 'smoker',
+                **agg(database[database.smoker == True].age),
+            },
+            {
+                'name': 'unemployed',
+                **agg(database[database.employed == False].age),
+            },
+            {
+                'name': 'employed',
+                **agg(database[database.employed == True].age),
+            },
+            {
+                'name': 'unemployed',
+                **agg(database[database.employed == False].age),
+            },
+        ]
+    )
