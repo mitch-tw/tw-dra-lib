@@ -26,6 +26,6 @@ setup(
     license='Not open source',
     tests_require=test_requirements,
     url='https://github.com/mitch-tw/dra',
-    version='0.12.0',
+    version='0.13.0',
     zip_safe=False,
 )
