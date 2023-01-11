@@ -17,8 +17,20 @@ def test_expected_results():
 
 
 def test_check_results_errors():
+    wrong_output = pd.DataFrame(
+        [
+            {'id': 'A1', 'name': 'total-population', 'count': 6, 'mean': 38.0, 'median': 30.0},
+            {'id': 'A2', 'name': 'non-smoker', 'count': 4, 'mean': 33.5, 'median': 30},
+            {'id': 'B2', 'name': 'smoker', 'count': 3, 'mean': 55, 'median': 30},
+            {'id': 'C2', 'name': 'unemployed', 'count': 4, 'mean': 48.5, 'median': 51},
+            {'id': 'D2', 'name': 'employed', 'count': 3, 'mean': 24, 'median': 24},
+            {'id': 'A3', 'name': 'single-adults', 'count': None, 'mean': None, 'median': None},
+            {'id': 'B3', 'name': 'married-adults', 'count': 5, 'mean': 48, 'median': 36},
+            {'id': 'A4', 'name': 'unemployed-non-smoker', 'count': 3, 'mean': 36.67, 'median': 36},
+        ]
+    )
     with pytest.raises(ValueError):
-        check_results(pd.DataFrame())
+        check_results(wrong_output)
 
 
 def test_check_results():
