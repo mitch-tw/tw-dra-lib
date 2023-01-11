@@ -54,32 +54,36 @@ def private_aggregation(
         }
 
 
-def global_differential_privacy(df: pd.DataFrame, epsilon: float = 5.4) -> PrivateDataFrame:
+def global_differential_privacy(
+    df: pd.DataFrame,
+    budget: float = 5.4,
+    epsilons: Tuple[float, ...] = (0.1, 0.1, 0.1),
+) -> PrivateDataFrame:
     age_bounds = (0, 125)
     clipped = df[df.age.between(*age_bounds)]
 
     pdf = pd.DataFrame(
         [
-            {'name': 'total-population', **private_aggregation(clipped.age)},
+            {'name': 'total-population', **private_aggregation(clipped.age, budget, epsilons)},
             {
                 'name': 'non-smoker',
-                **private_aggregation(clipped[clipped.smoker == False].age),
+                **private_aggregation(clipped[clipped.smoker == False].age, budget, epsilons),
             },
             {
                 'name': 'smoker',
-                **private_aggregation(clipped[clipped.smoker == True].age),
+                **private_aggregation(clipped[clipped.smoker == True].age, budget, epsilons),
             },
             {
                 'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),
+                **private_aggregation(clipped[clipped.employed == False].age, budget, epsilons),
             },
             {
                 'name': 'employed',
-                **private_aggregation(clipped[clipped.employed == True].age),
+                **private_aggregation(clipped[clipped.employed == True].age, budget, epsilons),
             },
             {
                 'name': 'unemployed',
-                **private_aggregation(clipped[clipped.employed == False].age),
+                **private_aggregation(clipped[clipped.employed == False].age, budget, epsilons),
             },
         ]
     )
