@@ -39,7 +39,7 @@ def randomised_response(truth: bool) -> bool:
 def private_aggregation(
     accountant: dp.BudgetAccountant,
     values: pd.Series,
-    epsilons: Tuple[float, ...] = (0.1, 0.5, 0.5),
+    epsilons: Tuple[float, ...] = (0.1, 0.1, 0.1),
 ) -> dict:
     count_epsilon, median_epsilon, mean_epsilon = epsilons
     return {
@@ -51,7 +51,7 @@ def private_aggregation(
     }
 
 
-def global_differential_privacy(df: pd.DataFrame, epsilon: float = 10) -> PrivateDataFrame:
+def global_differential_privacy(df: pd.DataFrame, epsilon: float = 5.4) -> PrivateDataFrame:
     age_bounds = (0, 125)
     clipped = df[df.age.between(*age_bounds)]
     with dp.BudgetAccountant(epsilon=epsilon) as budget:
@@ -84,11 +84,10 @@ def global_differential_privacy(df: pd.DataFrame, epsilon: float = 10) -> Privat
 
 
 def local_differential_privacy(df: pd.DataFrame, epsilon: float = 0.33) -> PrivateDataFrame:
+    laplace = dp.mechanisms.Laplace(epsilon=epsilon, sensitivity=1)
     private_database = df.copy()
     private_database = private_database.drop(columns=['name'])
-    private_database['age'] = df.age.apply(
-        lambda val: int(dp.mechanisms.Laplace(epsilon=epsilon, sensitivity=1).randomise(val))
-    )
+    private_database['age'] = df.age.apply(lambda val: int(laplace.randomise(val)))
     private_database['married'] = df.married.apply(randomised_response)
     private_database['smoker'] = df.smoker.apply(randomised_response)
     private_database['employed'] = df.employed.apply(randomised_response)
