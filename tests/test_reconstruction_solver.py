@@ -1,3 +1,4 @@
+import re
 from math import floor
 
 import pandas as pd
@@ -42,7 +43,9 @@ def test_reconstruction():
         smoker_indices=smoker_indices,
         employed_indices=employed_indices,
     )
-    assert float(check_accuracy(output, database).replace('%', '')) >= 92
+    accuracy = check_accuracy(output, database)
+    assert int(accuracy.replace('%', '')) >= 92
+    assert re.match(r'\d{2,3}%', accuracy) is not None
 
 
 def test_population_count(reconstructed):
