@@ -237,7 +237,7 @@ def check_accuracy(output, database) -> str:
                 match += 1
             else:
                 non_match += 1
-    return f'{round((match / (match + non_match))) * 100}%'
+    return f'{round(match / (match + non_match) * 100)}%'
 
 
 def pairwise(iterable):
