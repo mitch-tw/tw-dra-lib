@@ -37,49 +37,52 @@ def randomised_response(truth: bool) -> bool:
 
 
 def private_aggregation(
-    accountant: dp.BudgetAccountant,
     values: pd.Series,
+    budget: float = 5.4,
     epsilons: Tuple[float, ...] = (0.1, 0.1, 0.1),
 ) -> dict:
     count_epsilon, median_epsilon, mean_epsilon = epsilons
-    return {
-        'count': dp.tools.count_nonzero(values, epsilon=count_epsilon, accountant=accountant),
-        'median': dp.tools.median(
-            values, epsilon=median_epsilon, bounds=(30, 40), accountant=accountant
-        ),
-        'mean': dp.tools.mean(values, epsilon=mean_epsilon, bounds=(30, 40), accountant=accountant),
-    }
+    with dp.BudgetAccountant(epsilon=budget) as accountant:
+        return {
+            'count': dp.tools.count_nonzero(values, epsilon=count_epsilon, accountant=accountant),
+            'median': dp.tools.median(
+                values, epsilon=median_epsilon, bounds=(30, 40), accountant=accountant
+            ),
+            'mean': dp.tools.mean(
+                values, epsilon=mean_epsilon, bounds=(30, 40), accountant=accountant
+            ),
+        }
 
 
 def global_differential_privacy(df: pd.DataFrame, epsilon: float = 5.4) -> PrivateDataFrame:
     age_bounds = (0, 125)
     clipped = df[df.age.between(*age_bounds)]
-    with dp.BudgetAccountant(epsilon=epsilon) as budget:
-        pdf = pd.DataFrame(
-            [
-                {'name': 'total-population', **private_aggregation(budget, clipped.age)},
-                {
-                    'name': 'non-smoker',
-                    **private_aggregation(budget, clipped[clipped.smoker == False].age),
-                },
-                {
-                    'name': 'smoker',
-                    **private_aggregation(budget, clipped[clipped.smoker == True].age),
-                },
-                {
-                    'name': 'unemployed',
-                    **private_aggregation(budget, clipped[clipped.employed == False].age),
-                },
-                {
-                    'name': 'employed',
-                    **private_aggregation(budget, clipped[clipped.employed == True].age),
-                },
-                {
-                    'name': 'unemployed',
-                    **private_aggregation(budget, clipped[clipped.employed == False].age),
-                },
-            ]
-        )
+
+    pdf = pd.DataFrame(
+        [
+            {'name': 'total-population', **private_aggregation(clipped.age)},
+            {
+                'name': 'non-smoker',
+                **private_aggregation(clipped[clipped.smoker == False].age),
+            },
+            {
+                'name': 'smoker',
+                **private_aggregation(clipped[clipped.smoker == True].age),
+            },
+            {
+                'name': 'unemployed',
+                **private_aggregation(clipped[clipped.employed == False].age),
+            },
+            {
+                'name': 'employed',
+                **private_aggregation(clipped[clipped.employed == True].age),
+            },
+            {
+                'name': 'unemployed',
+                **private_aggregation(clipped[clipped.employed == False].age),
+            },
+        ]
+    )
     return PrivateDataFrame(pdf)
 
 
