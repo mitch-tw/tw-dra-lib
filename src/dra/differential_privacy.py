@@ -33,7 +33,7 @@ def epsilon_ranges(
     return pd.DataFrame(
         [
             {
-                'i': i,
+                'epsilon': i,
                 'noisy_mean': dp.tools.mean(values, epsilon=i, bounds=bounds),
                 'actual_mean': np.mean(values),
                 'noisy_median': dp.tools.median(values, epsilon=i, bounds=bounds),

@@ -12,7 +12,7 @@ def test_epsilon_ranges_columns():
     result = epsilon_ranges([i for i in range(100)])
     columns = list(result.columns)
     assert columns == [
-        'i',
+        'epsilon',
         'noisy_mean',
         'actual_mean',
         'noisy_median',
