@@ -101,11 +101,11 @@ def make_database(i: int = 100):
     return database
 
 
-def randomised_response(truth: bool) -> bool:
+def randomised_response(truth: bool, p: Tuple[float, float] = (0.5, 0.5)) -> bool:
     if np.random.choice((True, False)):
         return truth
     else:
-        return np.random.choice((True, False))
+        return np.random.choice((True, False), p=p)
 
 
 def private_aggregation(
@@ -174,7 +174,7 @@ def local_differential_privacy(df: pd.DataFrame, epsilon: float = 0.33) -> Priva
     return PrivateDataFrame(private_database)
 
 
-def no_differential_privacy(database: pd.DataFrame) -> pd.DataFrame:
+def aggregate(database: pd.DataFrame) -> pd.DataFrame:
     def agg(ages: pd.Series) -> dict:
         return {'count': len(ages), 'median': np.median(ages), 'mean': np.mean(ages)}
 
