@@ -78,7 +78,7 @@ def line_chart(
     )
     base_chart = (
         alt.Chart(df)
-        .mark_rule()
+        .mark_rule(strokeDash=[5, 5])
         .encode(y=alt.Y(y2, scale=alt.Scale(domain=(df[y2].min(), df[y2].max()))))
     )
     return base_chart + dp_chart
