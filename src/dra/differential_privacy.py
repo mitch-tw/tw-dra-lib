@@ -51,6 +51,7 @@ def line_chart(
     x: Optional[str] = None,
     y: Optional[str] = None,
     y2: Optional[str] = None,
+    title: str = '',
     color: str = Colours.red,
     width: int = 600,
 ) -> alt.Chart:
@@ -63,9 +64,7 @@ def line_chart(
             color=alt.value(color),
             tooltip=list(df.columns),
         )
-        .properties(
-            width=width,
-        )
+        .properties(width=width, title=title)
     )
     base_chart = (
         alt.Chart(df)
@@ -76,9 +75,13 @@ def line_chart(
 
 
 def make_epsilon_chart(df: pd.DataFrame) -> alt.Chart:
-    mean_chart = line_chart(df, x='epsilon', y='noisy_mean', y2='actual_mean')
-    median_chart = line_chart(df, x='epsilon', y='noisy_median', y2='actual_median')
-    count_chart = line_chart(df, x='epsilon', y='noisy_count', y2='actual_count')
+    mean_chart = line_chart(df, x='epsilon', y='noisy_mean', y2='actual_mean', title='Mean')
+    median_chart = line_chart(
+        df, x='epsilon', y='noisy_median', y2='actual_median', title='Median', color=Colours.teal
+    )
+    count_chart = line_chart(
+        df, x='epsilon', y='noisy_count', y2='actual_count', title='Count', color=Colours.orange
+    )
     return alt.hconcat(mean_chart, median_chart, count_chart).properties(
         title=alt.TitleParams(
             text='How does the mean, median and count change when we increase epsilon?',
