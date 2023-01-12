@@ -110,10 +110,10 @@ def make_database(i: int = 100):
 
 
 def randomised_response(truth: bool, p: Tuple[float, float] = (0.5, 0.5)) -> bool:
-    if np.random.choice((True, False)):
+    if np.random.choice((True, False), p=p):
         return truth
     else:
-        return np.random.choice((True, False), p=p)
+        return np.random.choice((True, False))
 
 
 def private_aggregation(
