@@ -1,5 +1,5 @@
 from functools import partial
-from typing import NewType, Tuple
+from typing import NewType, Optional, Tuple
 
 import altair as alt
 import diffprivlib as dp
@@ -50,9 +50,9 @@ def line_chart(
     df: pd.DataFrame,
     title: str,
     subtitle: str,
-    x: str | None = None,
-    y: str | None = None,
-    y2: str | None = None,
+    x: Optional[str] = None,
+    y: Optional[str] = None,
+    y2: Optional[str] = None,
     color: str = Colours.red,
 ) -> alt.Chart:
     dp_chart = (
