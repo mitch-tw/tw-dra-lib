@@ -1,6 +1,7 @@
 from functools import partial
 from typing import NewType, Tuple
 
+import altair as alt
 import diffprivlib as dp
 import numpy as np
 import pandas as pd
@@ -10,6 +11,77 @@ PrivateDataFrame = NewType('PrivateDataFrame', pd.DataFrame)  # type: ignore
 
 faker = Faker()
 rand_bool = partial(np.random.choice, (True, False))
+
+
+class Colours:
+    red = '#f2617a'
+    orange = '#cc850a'
+    green = '#6b9e78'
+    teal = '#47a1ad'
+    purple = '#634f7d'
+    dark_blue = '#003d4f'
+    light_gray = '#edf1f3'
+
+
+def epsilon_ranges(
+    values: list,
+    start: float = 0.01,
+    stop: float = 1.0,
+    step: float = 0.01,
+    bounds: Tuple[int, int] = (1, 125),
+):
+    return pd.DataFrame(
+        [
+            {
+                'i': i,
+                'noisy_mean': dp.tools.mean(values, epsilon=i, bounds=bounds),
+                'actual_mean': np.mean(values),
+                'noisy_median': dp.tools.median(values, epsilon=i, bounds=bounds),
+                'actual_median': np.median(values),
+                'noisy_count': dp.tools.count_nonzero(values, epsilon=i),
+                'actual_count': len(values),
+            }
+            for i in np.arange(start, stop, step)
+        ]
+    )
+
+
+def line_chart(
+    df: pd.DataFrame,
+    title: str,
+    subtitle: str,
+    x: str | None = None,
+    y: str | None = None,
+    y2: str | None = None,
+    color: str = Colours.red,
+) -> alt.Chart:
+    dp_chart = (
+        alt.Chart(df)
+        .mark_line(size=2, point=True)
+        .encode(
+            x=x,
+            y=alt.Y(y, scale=alt.Scale(domain=(df[y].min(), df[y].max()))),
+            color=alt.value(color),
+            tooltip=list(df.columns),
+        )
+        .properties(
+            width=800,
+            title=alt.TitleParams(
+                text=title,
+                subtitle=subtitle,
+                anchor='start',
+                dy=-10,
+                fontSize=18,
+                subtitleFontSize=15,
+            ),
+        )
+    )
+    base_chart = (
+        alt.Chart(df)
+        .mark_rule()
+        .encode(y=alt.Y(y2, scale=alt.Scale(domain=(df[y2].min(), df[y2].max()))))
+    )
+    return base_chart + dp_chart
 
 
 def make_database(i: int = 100):

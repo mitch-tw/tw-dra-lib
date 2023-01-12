@@ -4,3 +4,4 @@ z3-solver
 pipe
 numpy
 diffprivlib
+altair

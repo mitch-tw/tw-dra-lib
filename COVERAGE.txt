@@ -1,10 +1,10 @@
 Name                               Stmts   Miss  Cover
 ------------------------------------------------------
 src/dra/__init__.py                    3      0   100%
-src/dra/differential_privacy.py       37     37     0%
+src/dra/differential_privacy.py       52     25    52%
 src/dra/logger.py                      2      2     0%
 src/dra/reconstruction_solver.py     100      1    99%
 src/dra/smt_solvers.py                26      1    96%
 src/dra/summary_stats.py              19      0   100%
 ------------------------------------------------------
-TOTAL                                187     41    78%
+TOTAL                                202     29    86%
