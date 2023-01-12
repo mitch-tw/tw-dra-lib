@@ -48,12 +48,11 @@ def epsilon_ranges(
 
 def line_chart(
     df: pd.DataFrame,
-    title: str,
-    subtitle: str,
     x: Optional[str] = None,
     y: Optional[str] = None,
     y2: Optional[str] = None,
     color: str = Colours.red,
+    width: int = 600,
 ) -> alt.Chart:
     dp_chart = (
         alt.Chart(df)
@@ -65,15 +64,7 @@ def line_chart(
             tooltip=list(df.columns),
         )
         .properties(
-            width=800,
-            title=alt.TitleParams(
-                text=title,
-                subtitle=subtitle,
-                anchor='start',
-                dy=-10,
-                fontSize=18,
-                subtitleFontSize=15,
-            ),
+            width=width,
         )
     )
     base_chart = (
@@ -82,6 +73,23 @@ def line_chart(
         .encode(y=alt.Y(y2, scale=alt.Scale(domain=(df[y2].min(), df[y2].max()))))
     )
     return base_chart + dp_chart
+
+
+def make_epsilon_chart(df: pd.DataFrame) -> alt.Chart:
+    mean_chart = line_chart(df, x='epsilon', y='noisy_mean', y2='actual_mean')
+    median_chart = line_chart(df, x='epsilon', y='noisy_median', y2='actual_median')
+    count_chart = line_chart(df, x='epsilon', y='noisy_count', y2='actual_count')
+    return alt.hconcat(mean_chart, median_chart, count_chart).properties(
+        title=alt.TitleParams(
+            text='How does the mean, median and count change when we increase epsilon?',
+            anchor='start',
+            dy=-10,
+            fontSize=18,
+            subtitleFontSize=15,
+            subtitle='As you can see, increasing epsilon reduces the privacy guarantee'
+            ' by making it closer to the actual value',
+        )
+    )
 
 
 def make_database(i: int = 100):
